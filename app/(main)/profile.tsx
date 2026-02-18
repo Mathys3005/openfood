@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-const AddFoodScreen = () => {
+const ProfileScreen = () => {
     return (
         <SafeAreaView>
-            <Text>AddFood</Text>
+            <Text>Profile</Text>
         </SafeAreaView>
     )
 }
 
-export default AddFoodScreen
+export default ProfileScreen

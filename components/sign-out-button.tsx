@@ -11,7 +11,7 @@ export const SignOutButton = () => {
     try {
       await signOut()
       // Redirect to your desired page
-      router.replace('/(auth)/signup')
+      router.replace('login')
     } catch (err) {
       console.error(JSON.stringify(err, null, 2))
     }

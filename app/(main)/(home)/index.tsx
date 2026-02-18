@@ -3,15 +3,15 @@ import { Link } from 'expo-router'
 import { StyleSheet, Text } from 'react-native'
 import { View } from 'react-native'
 import { SignOutButton } from '../../../components/sign-out-button'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Page() {
   const { user } = useUser()
 
   const { session } = useSession()
-  console.log(session?.currentTask)
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Welcome!</Text>
       {/* Show the sign-in and sign-up buttons when the user is signed out */}
       <SignedOut>
@@ -27,7 +27,7 @@ export default function Page() {
         <Text style={styles.userText}>Hello {user?.emailAddresses[0].emailAddress}</Text>
         <SignOutButton />
       </SignedIn>
-    </View>
+    </SafeAreaView>
   )
 }
 
