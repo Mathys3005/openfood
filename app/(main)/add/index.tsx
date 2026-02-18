@@ -1,4 +1,4 @@
-import { View, Text, Pressable, TextInput } from 'react-native'
+import { View, Text, Pressable, TextInput, ScrollView, FlatList, Image } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { useEffect, useState } from 'react'
 import { mealTypes } from '../../../types/mealType.type'
@@ -10,21 +10,15 @@ const AddFoodScreen = () => {
     const [selectedMealType, setSelectedMealType] = useState<string>('')
     const [searchString, setSearchString] = useState<string>('')
     const [foods, setFoods] = useState<Food[]>([])
-    const debouncedSearchString = useDebounce(searchString, 800)
-    console.log('debouncedSearchString', debouncedSearchString)
-    console.log('foods', foods)
-    useEffect(() => {
-        let url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${debouncedSearchString}&search_simple=1&action=process&json=1`
-        
-        if (debouncedSearchString.trim() === '') {
-            setFoods([])
-            return
-        }
+    const debouncedSearchString = useDebounce(searchString, 1200)
 
+    useEffect(() => {
+        let url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(debouncedSearchString)}&search_simple=1&action=process&json=1`
+        
         fetch(url)
             .then((response) => response.json())
             .then((data) => {
-              const products = (data.products || [])
+              const products: Food[] = (data.products || [])
                 .filter((product: any) => !!product.nutriments)
                 .map((product: any) => ({
                   id: product.id,
@@ -33,12 +27,13 @@ const AddFoodScreen = () => {
                   carbohydrates: product.nutriments['carbohydrates_100g'] || 0,
                   proteins: product.nutriments['proteins_100g'] || 0,
                   fats: product.nutriments['fat_100g'] || 0,
-                  imageUrl: product.image_url || '',
+                  image_url: product.image_url || '',
                 }))
               setFoods(products)
             })
             .catch((error) => {
-                console.error('Error fetching food data:', error)
+                alert('Une erreur est survenue lors de la recherche de produits. Veuillez réessayer plus tard.')
+                console.error('Error fetching products:', error)
             })
     }, [debouncedSearchString])
 
@@ -85,6 +80,32 @@ const AddFoodScreen = () => {
                         <Ionicons name="scan" size={20} color="white" />
                     </Pressable>
                 </View>
+                <ScrollView style={styles.foodListContainer}>
+                    <FlatList
+                        data={foods}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => (
+                            <View style={styles.foodCard}>
+                                {item.image_url && (
+                                    <Image
+                                        source={{ uri: item.image_url }}
+                                        style={styles.foodImage}
+                                    />
+                                )}
+                                <View style={styles.foodInfo}>
+                                    <Text style={styles.foodName}>{item.name}</Text>
+                                    <Text style={styles.foodCalories}>
+                                        {Math.round(item.calories)} kcal
+                                    </Text>
+                                </View>
+                                <Pressable style={styles.addButton}>
+                                    <Ionicons name="add" size={24} color="white" />
+                                </Pressable>
+                            </View>
+                        )}
+                        scrollEnabled={false}
+                    />
+                </ScrollView>
             </View>
         </View>
     )
@@ -154,4 +175,37 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     width: '10%',
   },
+    foodListContainer: {
+        marginTop: 20,
+    },
+    foodCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 12,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        marginBottom: 12,
+    },
+    foodImage: {
+        width: 60,
+        height: 60,
+        borderRadius: 8,
+        marginRight: 12,
+    },
+    foodInfo: {
+        flex: 1,
+    },
+    foodName: {
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    foodCalories: {
+        color: '#8C8C8C',
+    },
+    addButton: {
+        padding: 8,
+        borderRadius: 8,
+        backgroundColor: '#4CAF50',
+    },
 })
