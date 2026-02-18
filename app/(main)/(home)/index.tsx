@@ -1,51 +1,63 @@
 import { SignedIn, SignedOut, useSession, useUser } from '@clerk/clerk-expo'
-import { Link } from 'expo-router'
-import { StyleSheet, Text } from 'react-native'
-import { View } from 'react-native'
-import { SignOutButton } from '../../../components/sign-out-button'
+import { Ionicons } from '@expo/vector-icons'
+import { useState } from 'react'
+import { StyleSheet, View, Text, Pressable } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { Meal } from '../../../types/meal.type'
+import { router } from 'expo-router'
 
 export default function Page() {
-  const { user } = useUser()
+  const [meals, setMeals] = useState<Meal[]>([])
 
-  const { session } = useSession()
+  if (meals.length === 0) {
+    return (
+      <SafeAreaView style={styles.safeAreaStyle}>
+        <View style={styles.containerStyle}>
+          <Ionicons name="restaurant-outline" size={80} color="#aeaeae" />
+          <Text style={styles.title}>Aucun repas enregistré</Text>
+          <Text style={styles.text}>Commencez par ajouter votre premier repas !</Text>
+        </View>
+        <Pressable onPress={() => router.push('add')} style={styles.addButton}>
+          <Ionicons name="add-circle" size={48} color="#4CAF50" />
+        </Pressable>
+      </SafeAreaView>
+    )
+  }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Welcome!</Text>
-      {/* Show the sign-in and sign-up buttons when the user is signed out */}
-      <SignedOut>
-        <Link href="/(auth)/sign-in">
-          <Text style={styles.linkText}>Sign in</Text>
-        </Link>
-        <Link href="/(auth)/sign-up">
-          <Text style={styles.linkText}>Sign up</Text>
-        </Link>
-      </SignedOut>
-      {/* Show the sign-out button when the user is signed in */}
-      <SignedIn>
-        <Text style={styles.userText}>Hello {user?.emailAddresses[0].emailAddress}</Text>
-        <SignOutButton />
-      </SignedIn>
+    <SafeAreaView style={styles.safeAreaStyle}>
+      <View style={styles.containerStyle}>
+        <Text style={styles.title}>Mes repas</Text>
+      </View>
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeAreaStyle: {
     flex: 1,
-    padding: 20,
-    gap: 16,
+    padding: 10,
   },
+  containerStyle: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#aeaeae',
   },
-  linkText: {
+  text: {
     fontSize: 16,
-    color: '#0a7ea4',
+    color: '#aeaeae',
   },
-  userText: {
-    fontSize: 16,
-  },
+
+  addButton: {
+    marginLeft: "auto",
+    marginTop: "auto",
+    width: 48,
+    height: 48,
+  }
 })
