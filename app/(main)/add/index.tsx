@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 import { mealTypes } from '../../../types/mealType.type'
 import { Ionicons } from '@expo/vector-icons'
 import { Food } from '../../../types/food.type'
+import { Meal } from '../../../types/meal.type'
 import useDebounce from '../../../tools/debounce'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const AddFoodScreen = () => {
     const [selectedMealType, setSelectedMealType] = useState<string>('')
@@ -14,10 +16,37 @@ const AddFoodScreen = () => {
     const debouncedSearchString = useDebounce(searchString, 1200)
 
 
-    const validateMeal = (foods: Food[]) => () => {
-        alert(`Repas ajouté avec ${foods.length} aliment(s)`)
-        setSelectedFoods([])
-        setSearchString('')
+    const validateMeal = (foods: Food[]) => async () => {
+        if (selectedMealType === '') {
+            alert('Veuillez sélectionner un type de repas.')
+            return
+        }
+
+        try {
+            const mealTypeName = mealTypes.find(m => m.id === selectedMealType)?.name || 'Repas'
+            
+            const newMeal: Meal = {
+                id: Date.now().toString(),
+                name: mealTypeName,
+                date: new Date().toISOString().split('T')[0],
+                foods: foods
+            }
+
+            const existingMeals = await AsyncStorage.getItem('meals')
+            const meals: Meal[] = existingMeals ? JSON.parse(existingMeals) : []
+
+            meals.push(newMeal)
+
+            await AsyncStorage.setItem('meals', JSON.stringify(meals))
+
+            alert(`Repas ajouté avec ${foods.length} aliment(s)`)
+            setSelectedFoods([])
+            setSearchString('')
+            setSelectedMealType('')
+        } catch (error) {
+            alert('Erreur lors de la sauvegarde du repas')
+            console.error('Error saving meal:', error)
+        }
     }
 
     useEffect(() => {
