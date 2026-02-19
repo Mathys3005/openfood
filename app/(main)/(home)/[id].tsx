@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 9,
     color: '#6B7A78',
     fontWeight: '600',
     textTransform: 'uppercase',
