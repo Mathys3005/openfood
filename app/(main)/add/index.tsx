@@ -177,6 +177,7 @@ const AddFoodScreen = () => {
                                 <View style={styles.foodInfo}>
                                     <Text style={styles.foodName}>{item.name}</Text>
                                     <Text style={styles.foodCalories}>{item.calories} kcal</Text>
+                                    <Text style={styles.foodCalories}>{item.brand}</Text>
                                 </View>
                                 <Pressable style={styles.removeButton} onPress={() => {
                                     setSelectedFoods(selectedFoods.filter(food => food.id !== item.id))
@@ -188,43 +189,45 @@ const AddFoodScreen = () => {
                     />
                 </>
             )}
-
-            <FlatList
-                style={styles.flatListScroll}
-                data={foods}
-                keyExtractor={(item, index) => `${item.id}-${index}`}
-                renderItem={({ item }) => (
-                    <View style={styles.foodCard}>
-                        {item.image_url ? (
-                            <Image
-                                source={{ uri: item.image_url }}
-                                style={styles.foodImage}
-                            />
-                        ) : (
-                            <View style={styles.foodImagePlaceholder}>
-                                <Ionicons name="image-outline" size={30} color="#C0C0C0" />
+            {debouncedSearchString && (
+                <FlatList
+                    style={styles.flatListScroll}
+                    data={foods}
+                    keyExtractor={(item, index) => `${item.id}-${index}`}
+                    renderItem={({ item }) => (
+                        <View style={styles.foodCard}>
+                            {item.image_url ? (
+                                <Image
+                                    source={{ uri: item.image_url }}
+                                    style={styles.foodImage}
+                                />
+                            ) : (
+                                <View style={styles.foodImagePlaceholder}>
+                                    <Ionicons name="image-outline" size={30} color="#C0C0C0" />
+                                </View>
+                            )}
+                            <View style={styles.foodInfo}>
+                                <Text style={styles.foodName}>{item.name}</Text>
+                                <Text style={styles.foodCalories}>{item.calories} kcal</Text>
+                                <Text style={styles.foodCalories}>{item.brand}</Text>
                             </View>
-                        )}
-                        <View style={styles.foodInfo}>
-                            <Text style={styles.foodName}>{item.name}</Text>
-                            <Text style={styles.foodCalories}>{item.calories} kcal</Text>
+                            <Pressable 
+                                style={selectedFoods.some(food => food.id === item.id) ? styles.removeButton : styles.addButton} 
+                                onPress={() => {
+                                    if (selectedFoods.some(food => food.id === item.id)) {
+                                        setSelectedFoods(selectedFoods.filter(food => food.id !== item.id))
+                                    } else {
+                                        setSelectedFoods([...selectedFoods, item])
+                                    }
+                                }}
+                            >
+                                <Ionicons name={selectedFoods.some(food => food.id === item.id) ? "remove" : "add"} size={20} color="white" />
+                            </Pressable>
                         </View>
-                        <Pressable 
-                            style={selectedFoods.some(food => food.id === item.id) ? styles.removeButton : styles.addButton} 
-                            onPress={() => {
-                                if (selectedFoods.some(food => food.id === item.id)) {
-                                    setSelectedFoods(selectedFoods.filter(food => food.id !== item.id))
-                                } else {
-                                    setSelectedFoods([...selectedFoods, item])
-                                }
-                            }}
-                        >
-                            <Ionicons name={selectedFoods.some(food => food.id === item.id) ? "remove" : "add"} size={20} color="white" />
-                        </Pressable>
-                    </View>
-                )}
-                contentContainerStyle={styles.flatListContent}
-            />
+                    )}
+                    contentContainerStyle={styles.flatListContent}
+                />
+            )}
         </View>
     )
 }
