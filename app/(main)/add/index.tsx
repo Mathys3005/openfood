@@ -80,40 +80,40 @@ const AddFoodScreen = () => {
     }, [debouncedSearchString])
 
     return (
-        <View style={{ flex: 1, padding: 16 }}>
-            <View style={styles.header}>
-                <Text style={styles.title}>Type de repas</Text>
-                {selectedFoods.length > 0 && (
-                <Pressable style={styles.validateButton} onPress={validateMeal(selectedFoods)}>
-                    <Text style={{ color: 'white', fontWeight: '600' }}>Valider</Text>
-                </Pressable>
-                )}
-            </View>
-            <View style={styles.mealTypeContainer}>
-                {mealTypes.map((mealType) => {
-                const isSelected = selectedMealType === mealType.id
-                return (
-                    <Pressable
-                    key={mealType.id}
-                    onPress={() => setSelectedMealType(mealType.id)}
-                    style={[
-                        styles.mealTypeButton,
-                        isSelected ? styles.mealTypeButtonSelected : null,
-                    ]}
-                    >
-                    <Text
-                        style={[
-                        styles.mealTypeText,
-                        isSelected ? styles.mealTypeTextSelected : null,
-                        ]}
-                    >
-                        {mealType.name}
-                    </Text>
+        <View style={{ flex: 1 }}>
+            <View style={styles.headerContainer}>
+                <View style={styles.header}>
+                    <Text style={styles.title}>Type de repas</Text>
+                    {selectedFoods.length > 0 && (
+                    <Pressable style={styles.validateButton} onPress={validateMeal(selectedFoods)}>
+                        <Text style={{ color: 'white', fontWeight: '600' }}>Valider</Text>
                     </Pressable>
-                )
-                })}
-            </View>
-            <View style={styles.foodListContainer}>
+                    )}
+                </View>
+                <View style={styles.mealTypeContainer}>
+                    {mealTypes.map((mealType) => {
+                    const isSelected = selectedMealType === mealType.id
+                    return (
+                        <Pressable
+                        key={mealType.id}
+                        onPress={() => setSelectedMealType(mealType.id)}
+                        style={[
+                            styles.mealTypeButton,
+                            isSelected ? styles.mealTypeButtonSelected : null,
+                        ]}
+                        >
+                        <Text
+                            style={[
+                            styles.mealTypeText,
+                            isSelected ? styles.mealTypeTextSelected : null,
+                            ]}
+                        >
+                            {mealType.name}
+                        </Text>
+                        </Pressable>
+                    )
+                    })}
+                </View>
                 <Text style={styles.title}>Rechercher un aliment</Text>
                 <View style={styles.searchContainer}>
                     <View style={styles.searchRow}>
@@ -129,16 +129,53 @@ const AddFoodScreen = () => {
                         <Ionicons name="scan" size={20} color="white" />
                     </Pressable>
                 </View>
-                {selectedFoods.length > 0 && foods.length === 0 && (
-                    <>
+            </View>
 
-                        <Text style={styles.selectedFoodsCount}>{selectedFoods.length} aliment(s) sélectionné(s)</Text>
-                        <FlatList
-                            style={{ marginTop: 20, marginBottom: 20 }}
-                            data={selectedFoods}
-                            keyExtractor={(item) => item.id}
-                            renderItem={({ item }) => (
-                                <View style={styles.foodCard}>
+            <FlatList
+                style={styles.flatListScroll}
+                data={foods}
+                keyExtractor={(item, index) => `${item.id}-${index}`}
+                renderItem={({ item }) => (
+                    <View style={styles.foodCard}>
+                        {item.image_url ? (
+                            <Image
+                                source={{ uri: item.image_url }}
+                                style={styles.foodImage}
+                            />
+                        ) : (
+                            <View style={styles.foodImagePlaceholder}>
+                                <Ionicons name="image-outline" size={30} color="#C0C0C0" />
+                            </View>
+                        )}
+                        <View style={styles.foodInfo}>
+                            <Text style={styles.foodName}>{item.name}</Text>
+                            <Text style={styles.foodCalories}>
+                                {Math.round(item.calories)} kcal
+                            </Text>
+                        </View>
+                        <Pressable style={selectedFoods.some(food => food.id === item.id) ? styles.removeButton : styles.addButton} onPress={() => {
+                            if (!selectedFoods.some(food => food.id === item.id)) {
+                                setSelectedFoods([...selectedFoods, item])
+                            } else {
+                                setSelectedFoods(selectedFoods.filter(food => food.id !== item.id))
+                            }
+                            
+                        }}>
+                        {selectedFoods.some(food => food.id === item.id) ? (
+                            <Ionicons name="remove" size={24} color="white" />
+                        ) : (
+                            <Ionicons name="add" size={24} color="white" />
+                        )}
+                        </Pressable>
+                    </View>
+                )}
+                contentContainerStyle={styles.flatListContent}
+                ListHeaderComponent={
+                    selectedFoods.length > 0 ? (
+                        <>
+                            <Text style={styles.selectedFoodsCount}>{selectedFoods.length} aliment(s) sélectionné(s)</Text>
+                            {selectedFoods.map((item) => (
+                                <View key={`selected-${item.id}`} style={styles.foodCard}>
                                     {item.image_url ? (
                                         <Image
                                             source={{ uri: item.image_url }}
@@ -161,50 +198,12 @@ const AddFoodScreen = () => {
                                         <Ionicons name="remove" size={24} color="white" />
                                     </Pressable>
                                 </View>
-                            )}
-                        />
-                    </>
-                )}
-                <FlatList
-                    style={{ marginTop: 20, paddingBottom: 100 }}
-                    data={foods}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <View style={styles.foodCard}>
-                            {item.image_url ? (
-                                <Image
-                                    source={{ uri: item.image_url }}
-                                    style={styles.foodImage}
-                                />
-                            ) : (
-                                <View style={styles.foodImagePlaceholder}>
-                                    <Ionicons name="image-outline" size={30} color="#C0C0C0" />
-                                </View>
-                            )}
-                            <View style={styles.foodInfo}>
-                                <Text style={styles.foodName}>{item.name}</Text>
-                                <Text style={styles.foodCalories}>
-                                    {Math.round(item.calories)} kcal
-                                </Text>
-                            </View>
-                            <Pressable style={selectedFoods.some(food => food.id === item.id) ? styles.removeButton : styles.addButton} onPress={() => {
-                                if (!selectedFoods.some(food => food.id === item.id)) {
-                                    setSelectedFoods([...selectedFoods, item])
-                                } else {
-                                    setSelectedFoods(selectedFoods.filter(food => food.id !== item.id))
-                                }
-                                
-                            }}>
-                            {selectedFoods.some(food => food.id === item.id) ? (
-                                <Ionicons name="remove" size={24} color="white" />
-                            ) : (
-                                <Ionicons name="add" size={24} color="white" />
-                            )}
-                            </Pressable>
-                        </View>
-                    )}
-                />
-            </View>
+                            ))}
+                            <Text style={styles.dividerTitle}>Résultats de recherche</Text>
+                        </>
+                    ) : null
+                }
+            />
         </View>
     )
 }
@@ -212,6 +211,12 @@ const AddFoodScreen = () => {
 export default AddFoodScreen
 
 const styles = StyleSheet.create({
+    headerContainer: {
+        paddingHorizontal: 16,
+        paddingTop: 16,
+        paddingBottom: 10,
+        backgroundColor: '#FFFFFF',
+    },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -222,6 +227,10 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 0,
+    },
+    flatListScroll: {
+        flex: 1,
+        paddingHorizontal: 16,
     },
   mealTypeContainer: {
     flexDirection: 'row',
@@ -283,6 +292,9 @@ const styles = StyleSheet.create({
     foodListContainer: {
         marginTop: 10,
     },
+    flatListContent: {
+        paddingBottom: 100,
+    },
     foodCard: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -329,8 +341,17 @@ const styles = StyleSheet.create({
     },
     selectedFoodsCount: {
         marginTop: 10,
+        marginBottom: 10,
         fontSize: 14,
+        fontWeight: '600',
         color: '#4CAF50',
+    },
+    dividerTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#2E2E2E',
+        marginTop: 20,
+        marginBottom: 12,
     },
     validateButton: {
         padding: 12,
