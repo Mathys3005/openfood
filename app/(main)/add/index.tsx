@@ -1,5 +1,5 @@
 import { View, Text, Pressable, TextInput, ScrollView, FlatList, Image, StyleSheet, Alert } from 'react-native'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, use } from 'react'
 import { mealTypes } from '../../../types/mealType.type'
 import { Ionicons } from '@expo/vector-icons'
 import { Food } from '../../../types/food.type'
@@ -14,28 +14,40 @@ const AddFoodScreen = () => {
     const [foods, setFoods] = useState<Food[]>([])
     const [selectedFoods, setSelectedFoods] = useState<Food[]>([])
     const debouncedSearchString = useDebounce(searchString, 1200)
-    const { scannedFood } = useLocalSearchParams()
+    const [scannedFood, setScannedFood] = useState<string | null>(null)
 
     useFocusEffect(
         useCallback(() => {
-            addScannedFoodToSelected()
-        }, [scannedFood])
+            const loadScannedFood = async () => {
+                const food = await AsyncStorage.getItem("scannedFood")
+                setScannedFood(food)
+            }
+            loadScannedFood()
+        }, [])
     )
+    
 
     const addScannedFoodToSelected = async () => {
-        try {
-            if (scannedFood) {
-                const food: Food = JSON.parse(scannedFood as string)
-                console.log('Scanned food:', food)
+        if (scannedFood) {
+            try {
+                const food: Food = JSON.parse(scannedFood)
                 if (!selectedFoods.some(f => f.id === food.id)) {
-                    setSelectedFoods([...selectedFoods, food])
-                    setSearchString('')
+                    setSelectedFoods(prev => [...prev, food])
+                    await AsyncStorage.removeItem("scannedFood")
+                    setScannedFood(null)
                 }
+            } catch (error) {
+                console.error("Erreur parsing scanned food:", error)
+                Alert.alert("Une erreur est survenue avec le produit scanné. Veuillez réessayer.")
             }
-        } catch (error) {
-            console.error('Error adding scanned food:', error)
         }
     }
+
+    useEffect(() => {
+        if (scannedFood) {
+            addScannedFoodToSelected()
+        }
+    }, [scannedFood])
 
     const validateMeal = (foods: Food[]) => async () => {
         if (selectedMealType === '') {

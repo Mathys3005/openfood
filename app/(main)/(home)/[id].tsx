@@ -90,6 +90,9 @@ const DetailMealScreen = () => {
                   C: {Math.round(item.carbs)}g
                 </Text>
               </View>
+              <Text style={styles.foodBrand}>
+                {item.brand ? `Marque : ${item.brand}` : ''}
+              </Text>
             </View>
           </View>
         )}
@@ -242,6 +245,12 @@ const styles = StyleSheet.create({
   nutritionSeparator: {
     marginHorizontal: 4,
     color: '#E0E0E0',
+  },
+  foodBrand: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#4CAF50',
+    fontWeight: '600',
   },
 })
 

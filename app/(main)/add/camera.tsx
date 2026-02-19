@@ -7,6 +7,7 @@ import {
     Alert,
     ActivityIndicator,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useLocalSearchParams } from "expo-router";
@@ -21,6 +22,7 @@ export default function CameraScreen() {
     useFocusEffect(
         React.useCallback(() => {
             setScanned(false);
+            setLoading(false);
         }, [])
     );
  
@@ -98,12 +100,9 @@ export default function CameraScreen() {
                 brand: p.brands ?? "",
             };
  
-            router.replace({
-                pathname: "/add",
-                params: {
-                    scannedFood: JSON.stringify(food),
-                },
-            });
+
+            await AsyncStorage.setItem("scannedFood", JSON.stringify(food));
+
         } catch (error) {
             console.error("Erreur fetch:", error); // ← pour débugger
             Alert.alert(

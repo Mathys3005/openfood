@@ -83,7 +83,7 @@ export default function Page() {
                   onPress={() => deleteMeal(item.id)}
                   style={styles.mealCardDeleteButton}
                 >
-                  <Ionicons name="trash" size={24} color="white" />
+                  <Ionicons name="remove" size={24} color="white"/>
                 </Pressable>
               </View>
             </View>
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   },
   mealCardDeleteButton: {
     padding: 8,
-    borderRadius: 8,
+    borderRadius: 100,
     backgroundColor: '#FF6B6B',
   },
   mealName: {
