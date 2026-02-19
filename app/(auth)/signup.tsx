@@ -1,7 +1,7 @@
 import { useSignUp } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
 import * as React from 'react'
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 
 export default function Page() {
   const { isLoaded, signUp, setActive } = useSignUp()
@@ -75,124 +75,186 @@ export default function Page() {
 
   if (pendingVerification) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>
-          Verify your email
-        </Text>
-        <Text style={styles.description}>
-          A verification code has been sent to your email.
-        </Text>
-        <TextInput
-          style={styles.input}
-          value={code}
-          placeholder="Enter your verification code"
-          placeholderTextColor="#666666"
-          onChangeText={(code) => setCode(code)}
-          keyboardType="numeric"
-        />
-        <Pressable
-          style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
-          onPress={onVerifyPress}
-        >
-          <Text style={styles.buttonText}>Verify</Text>
-        </Pressable>
-      </View>
+      <KeyboardAvoidingView
+        style={styles.screen}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <View style={styles.orbOne} />
+        <View style={styles.orbTwo} />
+        <View style={styles.card}>
+          <Text style={styles.appName}>OpenFood</Text>
+          <Text style={styles.title}>Verification email</Text>
+          <Text style={styles.description}>
+            Un code de verification a ete envoye a votre email.
+          </Text>
+          <TextInput
+            style={styles.input}
+            value={code}
+            placeholder="Entrez le code"
+            placeholderTextColor="#6B7A78"
+            onChangeText={(code) => setCode(code)}
+            keyboardType="numeric"
+          />
+          <Pressable
+            style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+            onPress={onVerifyPress}
+          >
+            <Text style={styles.buttonText}>Verifier</Text>
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
     )
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        Sign up
-      </Text>
-      <Text style={styles.label}>Email address</Text>
-      <TextInput
-        style={styles.input}
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Enter email"
-        placeholderTextColor="#666666"
-        onChangeText={(email) => setEmailAddress(email)}
-        keyboardType="email-address"
-      />
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        placeholder="Enter password"
-        placeholderTextColor="#666666"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      <Pressable
-        style={({ pressed }) => [
-          styles.button,
-          (!emailAddress || !password) && styles.buttonDisabled,
-          pressed && styles.buttonPressed,
-        ]}
-        onPress={onSignUpPress}
-        disabled={!emailAddress || !password}
-      >
-        <Text style={styles.buttonText}>Continue</Text>
-      </Pressable>
-      <View style={styles.linkContainer}>
-        <Text>Have an account? </Text>
-        <Link href="/login">
-          <Text>Sign in</Text>
-        </Link>
+    <KeyboardAvoidingView
+      style={styles.screen}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <View style={styles.orbOne} />
+      <View style={styles.orbTwo} />
+      <View style={styles.card}>
+        <Text style={styles.appName}>OpenFood</Text>
+        <Text style={styles.title}>Inscription</Text>
+        <Text style={styles.subtitle}>Creez votre compte pour suivre vos repas.</Text>
+        <Text style={styles.label}>Adresse email</Text>
+        <TextInput
+          style={styles.input}
+          autoCapitalize="none"
+          value={emailAddress}
+          placeholder="Entrez votre email"
+          placeholderTextColor="#6B7A78"
+          onChangeText={(email) => setEmailAddress(email)}
+          keyboardType="email-address"
+        />
+        <Text style={styles.label}>Mot de passe</Text>
+        <TextInput
+          style={styles.input}
+          value={password}
+          placeholder="Entrez un mot de passe"
+          placeholderTextColor="#6B7A78"
+          secureTextEntry={true}
+          onChangeText={(password) => setPassword(password)}
+        />
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            (!emailAddress || !password) && styles.buttonDisabled,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={onSignUpPress}
+          disabled={!emailAddress || !password}
+        >
+          <Text style={styles.buttonText}>Continuer</Text>
+        </Pressable>
+        <View style={styles.linkContainer}>
+          <Text style={styles.linkTextMuted}>Deja un compte ? </Text>
+          <Link href="/login">
+            <Text style={styles.linkText}>Se connecter</Text>
+          </Link>
+        </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
+    backgroundColor: '#F3F7F5',
     padding: 20,
+    justifyContent: 'center',
+  },
+  orbOne: {
+    position: 'absolute',
+    width: 240,
+    height: 240,
+    borderRadius: 999,
+    backgroundColor: '#DFF4E8',
+    top: -60,
+    right: -80,
+  },
+  orbTwo: {
+    position: 'absolute',
+    width: 180,
+    height: 180,
+    borderRadius: 999,
+    backgroundColor: '#EAF7F1',
+    bottom: -40,
+    left: -40,
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#E2ECE7',
     gap: 12,
   },
+  appName: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#1F7A55',
+    letterSpacing: 0.5,
+  },
   title: {
-    marginBottom: 8,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1F2D2A',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#4E625C',
+    marginBottom: 4,
   },
   description: {
     fontSize: 14,
-    marginBottom: 16,
-    opacity: 0.8,
+    color: '#4E625C',
   },
   label: {
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: 13,
+    color: '#2E3E39',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
+    borderColor: '#D6E3DD',
+    borderRadius: 12,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#F8FBFA',
+    color: '#1F2D2A',
   },
   button: {
-    backgroundColor: '#0a7ea4',
+    backgroundColor: '#1F7A55',
     paddingVertical: 12,
     paddingHorizontal: 24,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 4,
   },
   buttonPressed: {
-    opacity: 0.7,
+    opacity: 0.8,
   },
   buttonDisabled: {
     opacity: 0.5,
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   linkContainer: {
     flexDirection: 'row',
     gap: 4,
-    marginTop: 12,
+    marginTop: 8,
     alignItems: 'center',
+  },
+  linkTextMuted: {
+    color: '#4E625C',
+  },
+  linkText: {
+    color: '#1F7A55',
+    fontWeight: '700',
   },
 })
