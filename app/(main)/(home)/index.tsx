@@ -163,7 +163,7 @@ export default function Page() {
                     <Image
                       source={{ uri: food.image_url }}
                       style={styles.foodPreviewImage}
-                      resizeMode="containe"
+                      resizeMode="contain"
                     />
                   ) : (
                     <View style={styles.foodPreviewPlaceholder}>
