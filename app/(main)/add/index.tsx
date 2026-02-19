@@ -10,16 +10,22 @@ const AddFoodScreen = () => {
     const [selectedMealType, setSelectedMealType] = useState<string>('')
     const [searchString, setSearchString] = useState<string>('')
     const [foods, setFoods] = useState<Food[]>([])
+    const [selectedFoods, setSelectedFoods] = useState<Food[]>([])
     const debouncedSearchString = useDebounce(searchString, 1200)
 
     useEffect(() => {
         let url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(debouncedSearchString)}&search_simple=1&action=process&json=1`
         
+        if (!debouncedSearchString) {
+            setFoods([])
+            return
+        }
+
         fetch(url)
             .then((response) => response.json())
             .then((data) => {
               const products: Food[] = (data.products || [])
-                .filter((product: any) => !!product.nutriments)
+                .filter((product: any) => !!product.nutriments && !!product.product_name)
                 .map((product: any) => ({
                   id: product.id,
                   name: product.product_name,
@@ -64,7 +70,7 @@ const AddFoodScreen = () => {
                 )
                 })}
             </View>
-            <View>
+            <View style={styles.foodListContainer}>
                 <Text style={styles.title}>Rechercher un aliment</Text>
                 <View style={styles.searchContainer}>
                     <View style={styles.searchRow}>
@@ -80,32 +86,81 @@ const AddFoodScreen = () => {
                         <Ionicons name="scan" size={20} color="white" />
                     </Pressable>
                 </View>
-                <ScrollView style={styles.foodListContainer}>
-                    <FlatList
-                        data={foods}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (
-                            <View style={styles.foodCard}>
-                                {item.image_url && (
-                                    <Image
-                                        source={{ uri: item.image_url }}
-                                        style={styles.foodImage}
-                                    />
-                                )}
-                                <View style={styles.foodInfo}>
-                                    <Text style={styles.foodName}>{item.name}</Text>
-                                    <Text style={styles.foodCalories}>
-                                        {Math.round(item.calories)} kcal
-                                    </Text>
+                {selectedFoods.length > 0 && foods.length === 0 && (
+                    <>
+                        <Text style={styles.selectedFoodsCount}>{selectedFoods.length} aliment(s) sélectionné(s)</Text>
+                        <FlatList
+                            style={{ marginTop: 20, marginBottom: 20 }}
+                            data={selectedFoods}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item }) => (
+                                <View style={styles.foodCard}>
+                                    {item.image_url ? (
+                                        <Image
+                                            source={{ uri: item.image_url }}
+                                            style={styles.foodImage}
+                                        />
+                                    ) : (
+                                        <View style={styles.foodImagePlaceholder}>
+                                            <Ionicons name="image-outline" size={30} color="#C0C0C0" />
+                                        </View>
+                                    )}
+                                    <View style={styles.foodInfo}>
+                                        <Text style={styles.foodName}>{item.name}</Text>
+                                        <Text style={styles.foodCalories}>
+                                            {Math.round(item.calories)} kcal
+                                        </Text>
+                                    </View>
+                                    <Pressable style={styles.removeButton} onPress={() => {
+                                        setSelectedFoods(selectedFoods.filter(food => food.id !== item.id))
+                                    }}>
+                                        <Ionicons name="remove" size={24} color="white" />
+                                    </Pressable>
                                 </View>
-                                <Pressable style={styles.addButton}>
-                                    <Ionicons name="add" size={24} color="white" />
-                                </Pressable>
+                            )}
+                        />
+                    </>
+                )}
+                <FlatList
+                    style={{ marginTop: 20, paddingBottom: 100 }}
+                    data={foods}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                        <View style={styles.foodCard}>
+                            {item.image_url ? (
+                                <Image
+                                    source={{ uri: item.image_url }}
+                                    style={styles.foodImage}
+                                />
+                            ) : (
+                                <View style={styles.foodImagePlaceholder}>
+                                    <Ionicons name="image-outline" size={30} color="#C0C0C0" />
+                                </View>
+                            )}
+                            <View style={styles.foodInfo}>
+                                <Text style={styles.foodName}>{item.name}</Text>
+                                <Text style={styles.foodCalories}>
+                                    {Math.round(item.calories)} kcal
+                                </Text>
                             </View>
-                        )}
-                        scrollEnabled={false}
-                    />
-                </ScrollView>
+                            <Pressable style={selectedFoods.some(food => food.id === item.id) ? styles.removeButton : styles.addButton} onPress={() => {
+                                if (!selectedFoods.some(food => food.id === item.id)) {
+                                    setSelectedFoods([...selectedFoods, item])
+                                } else {
+                                    setSelectedFoods(selectedFoods.filter(food => food.id !== item.id))
+                                }
+                                
+                            }}>
+                            {selectedFoods.some(food => food.id === item.id) ? (
+                                <Ionicons name="remove" size={24} color="white" />
+                            ) : (
+                                <Ionicons name="add" size={24} color="white" />
+                            )}
+                            </Pressable>
+                        </View>
+                    )}
+                />
+                
             </View>
         </View>
     )
@@ -123,14 +178,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 20,
-    gap: 8,
+    marginBottom: 10,
+    gap: 4,
   },
   mealTypeButton: {
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 20,
-    marginBottom: 8,
+    marginBottom: 5,
     borderWidth: 1,
     backgroundColor: '#F5F6F7',
     borderColor: '#E0E0E0',
@@ -140,7 +195,7 @@ const styles = StyleSheet.create({
     borderColor: '#4CAF50',
   },
   mealTypeText: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
     color: '#2E2E2E',
   },
@@ -193,6 +248,15 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginRight: 12,
     },
+    foodImagePlaceholder: {
+        width: 60,
+        height: 60,
+        borderRadius: 8,
+        marginRight: 12,
+        backgroundColor: '#F0F0F0',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     foodInfo: {
         flex: 1,
     },
@@ -205,7 +269,18 @@ const styles = StyleSheet.create({
     },
     addButton: {
         padding: 8,
-        borderRadius: 8,
+        borderRadius: 100,
         backgroundColor: '#4CAF50',
     },
+    removeButton: {
+        padding: 8,
+        borderRadius: 100,
+        backgroundColor: '#FF6B6B',
+    },
+    selectedFoodsCount: {
+        marginTop: 10,
+        fontSize: 14,
+        color: '#4CAF50',
+    },
+
 })
