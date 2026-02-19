@@ -163,10 +163,11 @@ export default function Page() {
                     <Image
                       source={{ uri: food.image_url }}
                       style={styles.foodPreviewImage}
+                      resizeMode="containe"
                     />
                   ) : (
                     <View style={styles.foodPreviewPlaceholder}>
-                      <Ionicons name="image-outline" size={16} color="#C0C0C0" />
+                      <Ionicons name="image-outline" size={16} color="#D6E3DD" />
                     </View>
                   )}
                 </View>
@@ -191,6 +192,7 @@ export default function Page() {
 const styles = StyleSheet.create({
   safeAreaStyle: {
     flex: 1,
+    backgroundColor: '#F3F7F5',
     padding: 16,
   },
   containerStyle: {
@@ -199,37 +201,53 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   header: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2E2E2E',
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#1F7A55',
+    letterSpacing: 0.5,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#aeaeae',
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#4E625C',
   },
   text: {
-    fontSize: 16,
-    color: '#aeaeae',
+    fontSize: 14,
+    color: '#6B7A78',
+    marginTop: 8,
   },
   addButton: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
-    width: 48,
-    height: 48,
+    bottom: 24,
+    right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#1F7A55',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
   },
   goalCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    marginBottom: 16,
+    borderColor: '#D6E3DD',
+    marginBottom: 20,
     position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   goalEditButton: {
     position: 'absolute',
@@ -238,38 +256,43 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   goalTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#2E2E2E',
+    color: '#2E3E39',
     marginBottom: 8,
   },
   goalValue: {
-    fontSize: 14,
-    color: '#4CAF50',
-    fontWeight: '600',
-    marginBottom: 10,
+    fontSize: 16,
+    color: '#1F7A55',
+    fontWeight: '700',
+    marginBottom: 12,
   },
   progressTrack: {
     height: 10,
     borderRadius: 999,
-    backgroundColor: '#EAEAEA',
+    backgroundColor: '#E2ECE7',
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     borderRadius: 999,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#1F7A55',
   },
   flatListContent: {
-    paddingBottom: 80,
+    paddingBottom: 100,
   },
   mealCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: '#D6E3DD',
     marginBottom: 12,
-    padding: 16,
+    padding: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   mealCardContent: {
     flexDirection: 'row',
@@ -288,21 +311,21 @@ const styles = StyleSheet.create({
   mealCardDeleteButton: {
     padding: 8,
     borderRadius: 100,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#E53935',
   },
   mealName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2E2E2E',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1F2D2A',
   },
   mealDate: {
     fontSize: 12,
-    color: '#8C8C8C',
+    color: '#6B7A78',
     marginTop: 4,
   },
   mealFoodsCount: {
     fontSize: 12,
-    color: '#4CAF50',
+    color: '#1F7A55',
     fontWeight: '600',
     marginTop: 4,
   },
@@ -313,8 +336,11 @@ const styles = StyleSheet.create({
   foodPreviewItem: {
     width: 50,
     height: 50,
-    borderRadius: 8,
+    borderRadius: 10,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#D6E3DD',
+    backgroundColor: '#F8FBFA',
   },
   foodPreviewImage: {
     width: '100%',
@@ -323,21 +349,23 @@ const styles = StyleSheet.create({
   foodPreviewPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#F8FBFA',
     justifyContent: 'center',
     alignItems: 'center',
   },
   foodPreviewMore: {
     width: 50,
     height: 50,
-    borderRadius: 8,
-    backgroundColor: '#4CAF50',
+    borderRadius: 10,
+    backgroundColor: '#1F7A55',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#1F7A55',
   },
   foodPreviewMoreText: {
     color: 'white',
-    fontWeight: 'bold',
+    fontWeight: '700',
     fontSize: 12,
   },
 })

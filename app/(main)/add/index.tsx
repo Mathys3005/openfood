@@ -197,10 +197,11 @@ const AddFoodScreen = () => {
                                     <Image
                                         source={{ uri: item.image_url }}
                                         style={styles.foodImage}
+                                        resizeMode="contain"
                                     />
                                 ) : (
                                     <View style={styles.foodImagePlaceholder}>
-                                        <Ionicons name="image-outline" size={30} color="#C0C0C0" />
+                                        <Ionicons name="image-outline" size={30} color="#D6E3DD" />
                                     </View>
                                 )}
                                 <View style={styles.foodInfo}>
@@ -232,10 +233,11 @@ const AddFoodScreen = () => {
                                 <Image
                                     source={{ uri: item.image_url }}
                                     style={styles.foodImage}
+                                    resizeMode="contain"
                                 />
                             ) : (
                                 <View style={styles.foodImagePlaceholder}>
-                                    <Ionicons name="image-outline" size={30} color="#C0C0C0" />
+                                    <Ionicons name="image-outline" size={30} color="#D6E3DD" />
                                 </View>
                             )}
                             <View style={styles.foodInfo}>
@@ -273,48 +275,52 @@ const styles = StyleSheet.create({
     headerContainer: {
         paddingHorizontal: 16,
         paddingTop: 16,
-        paddingBottom: 10,
-        backgroundColor: '#FFFFFF',
+        paddingBottom: 12,
+        backgroundColor: '#F3F7F5',
+        borderBottomWidth: 1,
+        borderBottomColor: '#D6E3DD',
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 16,
     },
     title: {
         fontSize: 20,
-        fontWeight: 'bold',
+        fontWeight: '700',
+        color: '#1F7A55',
         marginBottom: 0,
     },
     flatListScroll: {
         flex: 1,
         paddingHorizontal: 16,
+        backgroundColor: '#F3F7F5',
     },
     mealTypeContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
-        marginBottom: 10,
-        gap: 4,
+        marginBottom: 12,
+        gap: 8,
     },
     mealTypeButton: {
-        paddingVertical: 14,
-        paddingHorizontal: 16,
-        borderRadius: 20,
-        marginBottom: 5,
+        paddingVertical: 12,
+        paddingHorizontal: 14,
+        borderRadius: 12,
+        marginBottom: 4,
         borderWidth: 1,
-        backgroundColor: '#F5F6F7',
-        borderColor: '#E0E0E0',
+        backgroundColor: '#FFFFFF',
+        borderColor: '#D6E3DD',
     },
     mealTypeButtonSelected: {
-        backgroundColor: '#4CAF50',
-        borderColor: '#4CAF50',
+        backgroundColor: '#1F7A55',
+        borderColor: '#1F7A55',
     },
     mealTypeText: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#2E2E2E',
+        color: '#4E625C',
     },
     mealTypeTextSelected: {
         color: '#FFFFFF',
@@ -322,107 +328,125 @@ const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 10,
-        height: 40,
+        marginTop: 8,
+        height: 44,
+        gap: 8,
     },
     searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#E0E0E0',
-        borderRadius: 8,
+        borderColor: '#D6E3DD',
+        borderRadius: 12,
         paddingHorizontal: 12,
         flex: 1,
+        backgroundColor: '#FFFFFF',
     },
     searchInput: {
         flex: 1,
         paddingVertical: 12,
         marginLeft: 8,
+        color: '#1F2D2A',
     },
     cameraButton: {
-        marginLeft: 8,
-        padding: 8,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#4CAF50',
-        backgroundColor: '#4CAF50',
+        padding: 10,
+        borderRadius: 12,
+        backgroundColor: '#1F7A55',
         justifyContent: 'center',
         alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     flatListContent: {
         paddingBottom: 100,
+        paddingTop: 12,
     },
     foodCard: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 12,
-        borderRadius: 8,
+        borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#E0E0E0',
-        marginBottom: 12,
+        borderColor: '#D6E3DD',
+        marginBottom: 10,
+        backgroundColor: '#FFFFFF',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 3,
+        elevation: 1,
     },
     foodImage: {
         width: 60,
         height: 60,
-        borderRadius: 8,
+        borderRadius: 10,
         marginRight: 12,
+        overflow: 'hidden',
     },
     foodImagePlaceholder: {
         width: 60,
         height: 60,
-        borderRadius: 8,
+        borderRadius: 10,
         marginRight: 12,
-        backgroundColor: '#F0F0F0',
+        backgroundColor: '#F8FBFA',
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#D6E3DD',
     },
     foodInfo: {
         flex: 1,
     },
     foodName: {
-        fontSize: 16,
-        fontWeight: '600',
+        fontSize: 15,
+        fontWeight: '700',
+        color: '#1F2D2A',
     },
     foodCalories: {
-        color: '#8C8C8C',
+        color: '#6B7A78',
+        fontSize: 13,
+        marginTop: 2,
     },
     nutriBadge: {
         alignSelf: 'flex-start',
         paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: 10,
-        marginTop: 4,
+        paddingVertical: 4,
+        borderRadius: 8,
+        marginTop: 6,
     },
     nutriBadgeText: {
         color: '#FFFFFF',
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: 11,
+        fontWeight: '700',
     },
     addButton: {
-        padding: 8,
+        padding: 10,
         borderRadius: 100,
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#1F7A55',
         justifyContent: 'center',
         alignItems: 'center',
     },
     removeButton: {
-        padding: 8,
+        padding: 10,
         borderRadius: 100,
-        backgroundColor: '#FF6B6B',
+        backgroundColor: '#E53935',
         justifyContent: 'center',
         alignItems: 'center',
     },
     selectedFoodsCount: {
-        marginTop: 10,
-        marginBottom: 10,
-        marginLeft: 12,
+        marginTop: 12,
+        marginBottom: 8,
+        marginLeft: 16,
         fontSize: 14,
-        fontWeight: '600',
-        color: '#4CAF50',
+        fontWeight: '700',
+        color: '#1F7A55',
     },
     validateButton: {
         padding: 12,
-        borderRadius: 8,
-        backgroundColor: '#4CAF50',
+        borderRadius: 12,
+        backgroundColor: '#1F7A55',
     },
 })

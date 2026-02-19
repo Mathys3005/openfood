@@ -15,7 +15,7 @@ const ProfileScreen = () => {
 
             <View style={styles.profileCard}>
                 <View style={styles.avatarContainer}>
-                    <Ionicons name="person-circle" size={80} color="#4CAF50" />
+                    <Ionicons name="person-circle" size={80} color="#1F7A55" />
                 </View>
 
                 <View style={styles.userInfoContainer}>
@@ -46,23 +46,29 @@ const styles = StyleSheet.create({
     safeAreaStyle: {
         flex: 1,
         padding: 16,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#F3F7F5',
     },
     header: {
         marginBottom: 24,
     },
     headerTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#2E2E2E',
+        fontSize: 28,
+        fontWeight: '800',
+        color: '#1F7A55',
+        letterSpacing: 0.5,
     },
     profileCard: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 12,
+        borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#E0E0E0',
+        borderColor: '#D6E3DD',
         padding: 24,
         marginBottom: 24,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 2,
     },
     avatarContainer: {
         alignItems: 'center',
@@ -70,18 +76,22 @@ const styles = StyleSheet.create({
     },
     userInfoContainer: {
         marginBottom: 20,
+        paddingBottom: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#D6E3DD',
     },
     label: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: '#8C8C8C',
+        fontSize: 11,
+        fontWeight: '700',
+        color: '#6B7A78',
         textTransform: 'uppercase',
-        marginBottom: 4,
+        letterSpacing: 0.5,
+        marginBottom: 6,
     },
     value: {
         fontSize: 16,
-        fontWeight: '500',
-        color: '#2E2E2E',
+        fontWeight: '600',
+        color: '#1F2D2A',
     },
     signOutContainer: {
         alignItems: 'center',

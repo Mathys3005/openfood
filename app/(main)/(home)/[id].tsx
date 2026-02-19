@@ -86,10 +86,11 @@ const DetailMealScreen = () => {
               <Image
                 source={{ uri: item.image_url }}
                 style={styles.foodImage}
+                resizeMode="contain"
               />
             ) : (
               <View style={styles.foodImagePlaceholder}>
-                <Ionicons name="image-outline" size={30} color="#C0C0C0" />
+                <Ionicons name="image-outline" size={30} color="#D6E3DD" />
               </View>
             )}
             <View style={styles.foodInfo}>
@@ -150,22 +151,24 @@ const styles = StyleSheet.create({
   viewStyle: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#F3F7F5',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2E2E2E',
-    marginLeft: 12,
+    fontWeight: '800',
+    color: '#1F7A55',
+    marginLeft: 0,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#8C8C8C',
-    marginLeft: 12,
+    color: '#6B7A78',
+    marginLeft: 0,
+    marginTop: 4,
   },
   containerStyle: {
     flex: 1,
@@ -174,14 +177,14 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 18,
-    color: '#2E2E2E',
+    color: '#1F2D2A',
     marginBottom: 20,
   },
   backButton: {
     paddingVertical: 12,
     paddingHorizontal: 24,
-    borderRadius: 8,
-    backgroundColor: '#4CAF50',
+    borderRadius: 12,
+    backgroundColor: '#1F7A55',
   },
   backButtonText: {
     color: 'white',
@@ -190,32 +193,38 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    marginBottom: 20,
     gap: 8,
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#F5F6F7',
-    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     padding: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: '#D6E3DD',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
+    elevation: 1,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#8C8C8C',
+    fontSize: 11,
+    color: '#6B7A78',
     fontWeight: '600',
+    textTransform: 'uppercase',
   },
   statValue: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#4CAF50',
+    fontWeight: '800',
+    color: '#1F7A55',
     marginTop: 4,
   },
   statUnit: {
     fontSize: 10,
-    color: '#8C8C8C',
+    color: '#6B7A78',
     marginTop: 2,
   },
   flatListContent: {
@@ -225,63 +234,72 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    marginBottom: 12,
+    borderColor: '#D6E3DD',
+    marginBottom: 10,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
+    elevation: 1,
   },
   foodImage: {
     width: 60,
     height: 60,
-    borderRadius: 8,
+    borderRadius: 10,
     marginRight: 12,
+    overflow: 'hidden',
   },
   foodImagePlaceholder: {
     width: 60,
     height: 60,
-    borderRadius: 8,
+    borderRadius: 10,
     marginRight: 12,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#F8FBFA',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#D6E3DD',
   },
   foodInfo: {
     flex: 1,
   },
   foodName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2E2E2E',
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1F2D2A',
   },
   nutritionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 6,
   },
   nutritionText: {
-    color: '#8C8C8C',
+    color: '#6B7A78',
     fontSize: 12,
   },
   nutritionSeparator: {
     marginHorizontal: 4,
-    color: '#E0E0E0',
+    color: '#D6E3DD',
   },
   nutriBadge: {
     alignSelf: 'flex-start',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
     marginTop: 6,
   },
   nutriBadgeText: {
     color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
   },
   foodBrand: {
     marginTop: 4,
     fontSize: 12,
-    color: '#4CAF50',
+    color: '#6B7A78',
     fontWeight: '600',
   },
 })
