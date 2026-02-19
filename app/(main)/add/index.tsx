@@ -13,6 +13,13 @@ const AddFoodScreen = () => {
     const [selectedFoods, setSelectedFoods] = useState<Food[]>([])
     const debouncedSearchString = useDebounce(searchString, 1200)
 
+
+    const validateMeal = (foods: Food[]) => () => {
+        alert(`Repas ajouté avec ${foods.length} aliment(s)`)
+        setSelectedFoods([])
+        setSearchString('')
+    }
+
     useEffect(() => {
         let url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(debouncedSearchString)}&search_simple=1&action=process&json=1`
         
@@ -45,7 +52,14 @@ const AddFoodScreen = () => {
 
     return (
         <View style={{ flex: 1, padding: 16 }}>
-            <Text style={styles.title}>Type de repas</Text>
+            <View style={styles.header}>
+                <Text style={styles.title}>Type de repas</Text>
+                {selectedFoods.length > 0 && (
+                <Pressable style={styles.validateButton} onPress={validateMeal(selectedFoods)}>
+                    <Text style={{ color: 'white', fontWeight: '600' }}>Valider</Text>
+                </Pressable>
+                )}
+            </View>
             <View style={styles.mealTypeContainer}>
                 {mealTypes.map((mealType) => {
                 const isSelected = selectedMealType === mealType.id
@@ -88,6 +102,7 @@ const AddFoodScreen = () => {
                 </View>
                 {selectedFoods.length > 0 && foods.length === 0 && (
                     <>
+
                         <Text style={styles.selectedFoodsCount}>{selectedFoods.length} aliment(s) sélectionné(s)</Text>
                         <FlatList
                             style={{ marginTop: 20, marginBottom: 20 }}
@@ -160,7 +175,6 @@ const AddFoodScreen = () => {
                         </View>
                     )}
                 />
-                
             </View>
         </View>
     )
@@ -169,10 +183,16 @@ const AddFoodScreen = () => {
 export default AddFoodScreen
 
 const styles = StyleSheet.create({
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
     title: {
         fontSize: 20,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 0,
     },
   mealTypeContainer: {
     flexDirection: 'row',
@@ -205,6 +225,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 10,
     height: 40,
   },
   searchRow: {
@@ -231,7 +252,7 @@ const styles = StyleSheet.create({
     width: '10%',
   },
     foodListContainer: {
-        marginTop: 20,
+        marginTop: 10,
     },
     foodCard: {
         flexDirection: 'row',
@@ -281,6 +302,11 @@ const styles = StyleSheet.create({
         marginTop: 10,
         fontSize: 14,
         color: '#4CAF50',
+    },
+    validateButton: {
+        padding: 12,
+        borderRadius: 8,
+        backgroundColor: '#4CAF50',
     },
 
 })
