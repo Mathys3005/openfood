@@ -125,11 +125,46 @@ const AddFoodScreen = () => {
                             onChangeText={setSearchString}
                         />
                     </View>
-                    <Pressable onPress={() => setSearchString('')} style={styles.cameraButton}>
+                    <Pressable onPress={() => router.push('/add/camera')} style={styles.cameraButton}>
                         <Ionicons name="scan" size={20} color="white" />
                     </Pressable>
                 </View>
             </View>
+
+            {selectedFoods.length > 0 && foods.length === 0 && (
+                <>
+                    <Text style={styles.selectedFoodsCount}>{selectedFoods.length} aliment(s) sélectionné(s)</Text>
+                    <FlatList
+                        style={styles.flatListScroll}
+                        data={selectedFoods}
+                        keyExtractor={(item, index) => `selected-${item.id}-${index}`}
+                        scrollEnabled={false}
+                        renderItem={({ item }) => (
+                            <View style={styles.foodCard}>
+                                {item.image_url ? (
+                                    <Image
+                                        source={{ uri: item.image_url }}
+                                        style={styles.foodImage}
+                                    />
+                                ) : (
+                                    <View style={styles.foodImagePlaceholder}>
+                                        <Ionicons name="image-outline" size={30} color="#C0C0C0" />
+                                    </View>
+                                )}
+                                <View style={styles.foodInfo}>
+                                    <Text style={styles.foodName}>{item.name}</Text>
+                                    <Text style={styles.foodCalories}>{item.calories} kcal</Text>
+                                </View>
+                                <Pressable style={styles.removeButton} onPress={() => {
+                                    setSelectedFoods(selectedFoods.filter(food => food.id !== item.id))
+                                }}>
+                                    <Ionicons name="remove" size={20} color="white" />
+                                </Pressable>
+                            </View>
+                        )}
+                    />
+                </>
+            )}
 
             <FlatList
                 style={styles.flatListScroll}
@@ -149,9 +184,7 @@ const AddFoodScreen = () => {
                         )}
                         <View style={styles.foodInfo}>
                             <Text style={styles.foodName}>{item.name}</Text>
-                            <Text style={styles.foodCalories}>
-                                {Math.round(item.calories)} kcal
-                            </Text>
+                            <Text style={styles.foodCalories}>{item.calories} kcal</Text>
                         </View>
                         <Pressable style={selectedFoods.some(food => food.id === item.id) ? styles.removeButton : styles.addButton} onPress={() => {
                             if (!selectedFoods.some(food => food.id === item.id)) {
