@@ -16,6 +16,23 @@ const AddFoodScreen = () => {
     const debouncedSearchString = useDebounce(searchString, 1200)
     const [scannedFood, setScannedFood] = useState<string | null>(null)
 
+    const getNutriColor = (score?: string) => {
+        switch ((score || '').toLowerCase()) {
+            case 'a':
+                return '#2E7D32'
+            case 'b':
+                return '#66BB6A'
+            case 'c':
+                return '#FBC02D'
+            case 'd':
+                return '#FB8C00'
+            case 'e':
+                return '#E53935'
+            default:
+                return '#9E9E9E'
+        }
+    }
+
     useFocusEffect(
         useCallback(() => {
             const loadScannedFood = async () => {
@@ -189,6 +206,9 @@ const AddFoodScreen = () => {
                                 <View style={styles.foodInfo}>
                                     <Text style={styles.foodName}>{item.name}</Text>
                                     <Text style={styles.foodCalories}>{item.calories} kcal</Text>
+                                    <View style={[styles.nutriBadge, { backgroundColor: getNutriColor(item.nutriscore) }]}>
+                                        <Text style={styles.nutriBadgeText}>Nutriscore {item.nutriscore ? item.nutriscore.toUpperCase() : 'N/A'}</Text>
+                                    </View>
                                     <Text style={styles.foodCalories}>{item.brand}</Text>
                                 </View>
                                 <Pressable style={styles.removeButton} onPress={() => {
@@ -221,6 +241,9 @@ const AddFoodScreen = () => {
                             <View style={styles.foodInfo}>
                                 <Text style={styles.foodName}>{item.name}</Text>
                                 <Text style={styles.foodCalories}>{item.calories} kcal</Text>
+                                <View style={[styles.nutriBadge, { backgroundColor: getNutriColor(item.nutriscore) }]}>
+                                    <Text style={styles.nutriBadgeText}>Nutriscore {item.nutriscore ? item.nutriscore.toUpperCase() : 'N/A'}</Text>
+                                </View>
                                 <Text style={styles.foodCalories}>{item.brand}</Text>
                             </View>
                             <Pressable 
@@ -362,6 +385,18 @@ const styles = StyleSheet.create({
     },
     foodCalories: {
         color: '#8C8C8C',
+    },
+    nutriBadge: {
+        alignSelf: 'flex-start',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 10,
+        marginTop: 4,
+    },
+    nutriBadgeText: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: '600',
     },
     addButton: {
         padding: 8,

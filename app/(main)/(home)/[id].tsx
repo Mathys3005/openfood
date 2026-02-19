@@ -11,6 +11,23 @@ const DetailMealScreen = () => {
   const [meal, setMeal] = useState<Meal | null>(null)
   const [loading, setLoading] = useState(true)
 
+  const getNutriColor = (score?: string) => {
+    switch ((score || '').toLowerCase()) {
+      case 'a':
+        return '#2E7D32'
+      case 'b':
+        return '#66BB6A'
+      case 'c':
+        return '#FBC02D'
+      case 'd':
+        return '#FB8C00'
+      case 'e':
+        return '#E53935'
+      default:
+        return '#9E9E9E'
+    }
+  }
+
   useEffect(() => {
     loadMealDetail()
   }, [id])
@@ -89,6 +106,9 @@ const DetailMealScreen = () => {
                 <Text style={styles.nutritionText}>
                   C: {Math.round(item.carbs)}g
                 </Text>
+              </View>
+              <View style={[styles.nutriBadge, { backgroundColor: getNutriColor(item.nutriscore) }]}>
+                <Text style={styles.nutriBadgeText}>Nutriscore {item.nutriscore ? item.nutriscore.toUpperCase() : 'N/A'}</Text>
               </View>
               <Text style={styles.foodBrand}>
                 {item.brand ? `Marque : ${item.brand}` : ''}
@@ -245,6 +265,18 @@ const styles = StyleSheet.create({
   nutritionSeparator: {
     marginHorizontal: 4,
     color: '#E0E0E0',
+  },
+  nutriBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    marginTop: 6,
+  },
+  nutriBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
   },
   foodBrand: {
     marginTop: 4,

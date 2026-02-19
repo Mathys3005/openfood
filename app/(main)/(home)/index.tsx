@@ -1,7 +1,7 @@
 import { SignedIn, SignedOut, useSession, useUser } from '@clerk/clerk-expo'
 import { Ionicons } from '@expo/vector-icons'
 import { useState, useEffect, useCallback } from 'react'
-import { StyleSheet, View, Text, Pressable, FlatList, Image } from 'react-native'
+import { StyleSheet, View, Text, Pressable, FlatList, Image, Alert, Platform } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Meal } from '../../../types/meal.type'
 import { router, useFocusEffect } from 'expo-router'
@@ -9,12 +9,61 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Page() {
   const [meals, setMeals] = useState<Meal[]>([])
+  const [dailyTargetKcal, setDailyTargetKcal] = useState<number>(2000)
+
+  const toYmd = (dateLike: string | Date) => {
+    const d = new Date(dateLike)
+    if (isNaN(d.getTime())) return ''
+    return d.toLocaleDateString('fr-CA')
+  }
+
+  const getMealCalories = (meal: Meal) =>
+    meal.foods.reduce((sum, food: any) => sum + (food.calories ?? 0), 0)
+
+  const loadDailyTarget = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('dailyTargetKcal')
+      if (stored) setDailyTargetKcal(Number(stored))
+    } catch (e) {
+      console.error('Error loading daily target:', e)
+    }
+  }
+
+  const saveDailyTarget = async (value: number) => {
+    try {
+      await AsyncStorage.setItem('dailyTargetKcal', String(value))
+      setDailyTargetKcal(value)
+    } catch (e) {
+      console.error('Error saving daily target:', e)
+    }
+  }
+
+  const promptDailyTarget = () => {
+    if (Platform.OS === 'ios') {
+      Alert.prompt(
+        'Objectif kcal',
+        'Entrez votre objectif journalier en kcal',
+        (text) => {
+          const v = Number(text)
+          if (!isNaN(v) && v > 0) saveDailyTarget(v)
+        },
+        'plain-text',
+        String(dailyTargetKcal)
+      )
+    } else {
+      Alert.alert(
+        'Objectif kcal',
+        'Fonction disponible sur iOS. Dis-moi si tu veux un modal Android.'
+      )
+    }
+  }
 
   const loadMeals = async () => {
     try {
       const existingMeals = await AsyncStorage.getItem('meals')
       const mealsData: Meal[] = existingMeals ? JSON.parse(existingMeals) : []
-      setMeals(mealsData)
+      const sortedMeals = mealsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      setMeals(sortedMeals)
     } catch (error) {
       console.error('Error loading meals:', error)
     }
@@ -36,8 +85,18 @@ export default function Page() {
   useFocusEffect(
     useCallback(() => {
       loadMeals()
+      loadDailyTarget()
     }, [])
   )
+
+  const todayKey = toYmd(new Date())
+  const todayKcal = meals
+    .filter(m => toYmd(m.date) === todayKey)
+    .reduce((sum, m) => sum + getMealCalories(m), 0)
+
+  const progress = dailyTargetKcal > 0
+    ? Math.min(todayKcal / dailyTargetKcal, 1)
+    : 0
 
   if (meals.length === 0) {
     return (
@@ -59,6 +118,16 @@ export default function Page() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Mes repas</Text>
       </View>
+      <Pressable style={styles.goalCard} onPress={promptDailyTarget}>
+        <View style={styles.goalEditButton}>
+          <Ionicons name="pencil" size={24} color="#4CAF50" />
+        </View>
+        <Text style={styles.goalTitle}>Objectif du jour</Text>
+        <Text style={styles.goalValue}>{todayKcal} / {dailyTargetKcal} kcal</Text>
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+        </View>
+      </Pressable>
       <FlatList
         data={meals}
         keyExtractor={(item) => item.id}
@@ -152,6 +221,44 @@ const styles = StyleSheet.create({
     right: 20,
     width: 48,
     height: 48,
+  },
+  goalCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    marginBottom: 16,
+    position: 'relative',
+  },
+  goalEditButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    padding: 6,
+  },
+  goalTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2E2E2E',
+    marginBottom: 8,
+  },
+  goalValue: {
+    fontSize: 14,
+    color: '#4CAF50',
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  progressTrack: {
+    height: 10,
+    borderRadius: 999,
+    backgroundColor: '#EAEAEA',
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 999,
+    backgroundColor: '#4CAF50',
   },
   flatListContent: {
     paddingBottom: 80,
