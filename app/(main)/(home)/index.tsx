@@ -1,6 +1,6 @@
 import { SignedIn, SignedOut, useSession, useUser } from '@clerk/clerk-expo'
 import { Ionicons } from '@expo/vector-icons'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { StyleSheet, View, Text, Pressable, FlatList, Image } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Meal } from '../../../types/meal.type'
@@ -9,10 +9,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Page() {
   const [meals, setMeals] = useState<Meal[]>([])
-
-  useFocusEffect(() => {
-    loadMeals()
-  })
 
   const loadMeals = async () => {
     try {
@@ -23,6 +19,25 @@ export default function Page() {
       console.error('Error loading meals:', error)
     }
   }
+
+  const deleteMeal = async (mealId: string) => {
+    try {
+      const existingMeals = await AsyncStorage.getItem('meals')
+      const mealsData: Meal[] = existingMeals ? JSON.parse(existingMeals) : []
+      const updatedMeals = mealsData.filter(meal => meal.id !== mealId)
+      await AsyncStorage.setItem('meals', JSON.stringify(updatedMeals))
+      setMeals(updatedMeals)
+    } catch (error) {
+      console.error('Error deleting meal:', error)
+      alert('Erreur lors de la suppression du repas')
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      loadMeals()
+    }, [])
+  )
 
   if (meals.length === 0) {
     return (
@@ -48,9 +63,8 @@ export default function Page() {
         data={meals}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <Pressable
+          <View
             style={styles.mealCard}
-            onPress={() => router.push(`../(home)/${item.id}`)}
           >
             <View style={styles.mealCardContent}>
               <View>
@@ -58,7 +72,20 @@ export default function Page() {
                 <Text style={styles.mealDate}>{item.date}</Text>
                 <Text style={styles.mealFoodsCount}>{item.foods.length} aliment(s)</Text>
               </View>
-              <Ionicons name="chevron-forward" size={24} color="#4CAF50" />
+              <View style={styles.mealCardActions}>
+                <Pressable
+                  onPress={() => router.push(`../(home)/${item.id}`)}
+                  style={styles.mealCardActionButton}
+                >
+                  <Ionicons name="chevron-forward" size={24} color="#4CAF50" />
+                </Pressable>
+                <Pressable
+                  onPress={() => deleteMeal(item.id)}
+                  style={styles.mealCardDeleteButton}
+                >
+                  <Ionicons name="trash" size={24} color="white" />
+                </Pressable>
+              </View>
             </View>
             <View style={styles.foodsPreview}>
               {item.foods.slice(0, 3).map((food) => (
@@ -81,7 +108,7 @@ export default function Page() {
                 </View>
               )}
             </View>
-          </Pressable>
+          </View>
         )}
         contentContainerStyle={styles.flatListContent}
       />
@@ -142,6 +169,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
+  },
+  mealCardActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  mealCardActionButton: {
+    padding: 8,
+  },
+  mealCardDeleteButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#FF6B6B',
   },
   mealName: {
     fontSize: 18,

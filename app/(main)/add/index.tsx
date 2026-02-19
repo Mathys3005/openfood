@@ -1,12 +1,12 @@
-import { View, Text, Pressable, TextInput, ScrollView, FlatList, Image } from 'react-native'
-import { StyleSheet } from 'react-native'
-import { useEffect, useState } from 'react'
+import { View, Text, Pressable, TextInput, ScrollView, FlatList, Image, StyleSheet, Alert } from 'react-native'
+import { useEffect, useState, useCallback } from 'react'
 import { mealTypes } from '../../../types/mealType.type'
 import { Ionicons } from '@expo/vector-icons'
 import { Food } from '../../../types/food.type'
 import { Meal } from '../../../types/meal.type'
 import useDebounce from '../../../tools/debounce'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 
 const AddFoodScreen = () => {
     const [selectedMealType, setSelectedMealType] = useState<string>('')
@@ -14,11 +14,32 @@ const AddFoodScreen = () => {
     const [foods, setFoods] = useState<Food[]>([])
     const [selectedFoods, setSelectedFoods] = useState<Food[]>([])
     const debouncedSearchString = useDebounce(searchString, 1200)
+    const { scannedFood } = useLocalSearchParams()
 
+    useFocusEffect(
+        useCallback(() => {
+            addScannedFoodToSelected()
+        }, [scannedFood])
+    )
+
+    const addScannedFoodToSelected = async () => {
+        try {
+            if (scannedFood) {
+                const food: Food = JSON.parse(scannedFood as string)
+                console.log('Scanned food:', food)
+                if (!selectedFoods.some(f => f.id === food.id)) {
+                    setSelectedFoods([...selectedFoods, food])
+                    setSearchString('')
+                }
+            }
+        } catch (error) {
+            console.error('Error adding scanned food:', error)
+        }
+    }
 
     const validateMeal = (foods: Food[]) => async () => {
         if (selectedMealType === '') {
-            alert('Veuillez sélectionner un type de repas.')
+            Alert.alert('Veuillez sélectionner un type de repas.')
             return
         }
 
@@ -39,12 +60,12 @@ const AddFoodScreen = () => {
 
             await AsyncStorage.setItem('meals', JSON.stringify(meals))
 
-            alert(`Repas ajouté avec ${foods.length} aliment(s)`)
+            Alert.alert(`Repas ajouté avec ${foods.length} aliment(s)`)
             setSelectedFoods([])
             setSearchString('')
             setSelectedMealType('')
         } catch (error) {
-            alert('Erreur lors de la sauvegarde du repas')
+            Alert.alert('Erreur lors de la sauvegarde du repas')
             console.error('Error saving meal:', error)
         }
     }
@@ -65,8 +86,10 @@ const AddFoodScreen = () => {
                 .map((product: any) => ({
                   id: product.id,
                   name: product.product_name,
+                  brand: product.brands || '',
+                  nutriscore: product.nutriscore_grade || '',
                   calories: product.nutriments['energy-kcal_100g'] || 0,
-                  carbohydrates: product.nutriments['carbohydrates_100g'] || 0,
+                  carbs: product.nutriments['carbohydrates_100g'] || 0,
                   proteins: product.nutriments['proteins_100g'] || 0,
                   fats: product.nutriments['fat_100g'] || 0,
                   image_url: product.image_url || '',
@@ -74,7 +97,7 @@ const AddFoodScreen = () => {
               setFoods(products)
             })
             .catch((error) => {
-                alert('Une erreur est survenue lors de la recherche de produits. Veuillez réessayer plus tard.')
+                Alert.alert('Une erreur est survenue lors de la recherche de produits. Veuillez réessayer plus tard.')
                 console.error('Error fetching products:', error)
             })
     }, [debouncedSearchString])
@@ -87,7 +110,7 @@ const AddFoodScreen = () => {
                     {selectedFoods.length > 0 && (
                     <Pressable style={styles.validateButton} onPress={validateMeal(selectedFoods)}>
                         <Text style={{ color: 'white', fontWeight: '600' }}>Valider</Text>
-                    </Pressable>
+                        </Pressable>
                     )}
                 </View>
                 <View style={styles.mealTypeContainer}>
@@ -95,21 +118,21 @@ const AddFoodScreen = () => {
                     const isSelected = selectedMealType === mealType.id
                     return (
                         <Pressable
-                        key={mealType.id}
+                            key={mealType.id}
                         onPress={() => setSelectedMealType(mealType.id)}
-                        style={[
-                            styles.mealTypeButton,
-                            isSelected ? styles.mealTypeButtonSelected : null,
-                        ]}
-                        >
-                        <Text
                             style={[
-                            styles.mealTypeText,
-                            isSelected ? styles.mealTypeTextSelected : null,
+                                styles.mealTypeButton,
+                            isSelected ? styles.mealTypeButtonSelected : null,
                             ]}
                         >
-                            {mealType.name}
-                        </Text>
+                            <Text
+                                style={[
+                                    styles.mealTypeText,
+                            isSelected ? styles.mealTypeTextSelected : null,
+                                ]}
+                            >
+                                {mealType.name}
+                            </Text>
                         </Pressable>
                     )
                     })}
@@ -135,10 +158,10 @@ const AddFoodScreen = () => {
                 <>
                     <Text style={styles.selectedFoodsCount}>{selectedFoods.length} aliment(s) sélectionné(s)</Text>
                     <FlatList
+                        contentContainerStyle={styles.flatListContent}
                         style={styles.flatListScroll}
                         data={selectedFoods}
                         keyExtractor={(item, index) => `selected-${item.id}-${index}`}
-                        scrollEnabled={false}
                         renderItem={({ item }) => (
                             <View style={styles.foodCard}>
                                 {item.image_url ? (
@@ -186,56 +209,21 @@ const AddFoodScreen = () => {
                             <Text style={styles.foodName}>{item.name}</Text>
                             <Text style={styles.foodCalories}>{item.calories} kcal</Text>
                         </View>
-                        <Pressable style={selectedFoods.some(food => food.id === item.id) ? styles.removeButton : styles.addButton} onPress={() => {
-                            if (!selectedFoods.some(food => food.id === item.id)) {
-                                setSelectedFoods([...selectedFoods, item])
-                            } else {
-                                setSelectedFoods(selectedFoods.filter(food => food.id !== item.id))
-                            }
-                            
-                        }}>
-                        {selectedFoods.some(food => food.id === item.id) ? (
-                            <Ionicons name="remove" size={24} color="white" />
-                        ) : (
-                            <Ionicons name="add" size={24} color="white" />
-                        )}
+                        <Pressable 
+                            style={selectedFoods.some(food => food.id === item.id) ? styles.removeButton : styles.addButton} 
+                            onPress={() => {
+                                if (selectedFoods.some(food => food.id === item.id)) {
+                                    setSelectedFoods(selectedFoods.filter(food => food.id !== item.id))
+                                } else {
+                                    setSelectedFoods([...selectedFoods, item])
+                                }
+                            }}
+                        >
+                            <Ionicons name={selectedFoods.some(food => food.id === item.id) ? "remove" : "add"} size={20} color="white" />
                         </Pressable>
                     </View>
                 )}
                 contentContainerStyle={styles.flatListContent}
-                ListHeaderComponent={
-                    selectedFoods.length > 0 ? (
-                        <>
-                            <Text style={styles.selectedFoodsCount}>{selectedFoods.length} aliment(s) sélectionné(s)</Text>
-                            {selectedFoods.map((item) => (
-                                <View key={`selected-${item.id}`} style={styles.foodCard}>
-                                    {item.image_url ? (
-                                        <Image
-                                            source={{ uri: item.image_url }}
-                                            style={styles.foodImage}
-                                        />
-                                    ) : (
-                                        <View style={styles.foodImagePlaceholder}>
-                                            <Ionicons name="image-outline" size={30} color="#C0C0C0" />
-                                        </View>
-                                    )}
-                                    <View style={styles.foodInfo}>
-                                        <Text style={styles.foodName}>{item.name}</Text>
-                                        <Text style={styles.foodCalories}>
-                                            {Math.round(item.calories)} kcal
-                                        </Text>
-                                    </View>
-                                    <Pressable style={styles.removeButton} onPress={() => {
-                                        setSelectedFoods(selectedFoods.filter(food => food.id !== item.id))
-                                    }}>
-                                        <Ionicons name="remove" size={24} color="white" />
-                                    </Pressable>
-                                </View>
-                            ))}
-                            <Text style={styles.dividerTitle}>Résultats de recherche</Text>
-                        </>
-                    ) : null
-                }
             />
         </View>
     )
@@ -265,65 +253,63 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 16,
     },
-  mealTypeContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-    gap: 4,
-  },
-  mealTypeButton: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    marginBottom: 5,
-    borderWidth: 1,
-    backgroundColor: '#F5F6F7',
-    borderColor: '#E0E0E0',
-  },
-  mealTypeButtonSelected: {
-    backgroundColor: '#4CAF50',
-    borderColor: '#4CAF50',
-  },
-  mealTypeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#2E2E2E',
-  },
-  mealTypeTextSelected: {
-    color: '#FFFFFF',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-    height: 40,
-  },
-  searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    width: '90%',
-  },
-  searchInput: {
-    flex: 1,
-    paddingVertical: 12,
-    marginLeft: 8,
-  },
-  cameraButton: {
-    marginLeft: 8,
-    padding: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#4CAF50',
-    backgroundColor: '#4CAF50',
-    width: '10%',
-  },
-    foodListContainer: {
+    mealTypeContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+        gap: 4,
+    },
+    mealTypeButton: {
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        marginBottom: 5,
+        borderWidth: 1,
+        backgroundColor: '#F5F6F7',
+        borderColor: '#E0E0E0',
+    },
+    mealTypeButtonSelected: {
+        backgroundColor: '#4CAF50',
+        borderColor: '#4CAF50',
+    },
+    mealTypeText: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#2E2E2E',
+    },
+    mealTypeTextSelected: {
+        color: '#FFFFFF',
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         marginTop: 10,
+        height: 40,
+    },
+    searchRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        flex: 1,
+    },
+    searchInput: {
+        flex: 1,
+        paddingVertical: 12,
+        marginLeft: 8,
+    },
+    cameraButton: {
+        marginLeft: 8,
+        padding: 8,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#4CAF50',
+        backgroundColor: '#4CAF50',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     flatListContent: {
         paddingBottom: 100,
@@ -366,30 +352,27 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 100,
         backgroundColor: '#4CAF50',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     removeButton: {
         padding: 8,
         borderRadius: 100,
         backgroundColor: '#FF6B6B',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     selectedFoodsCount: {
         marginTop: 10,
         marginBottom: 10,
+        marginLeft: 12,
         fontSize: 14,
         fontWeight: '600',
         color: '#4CAF50',
-    },
-    dividerTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#2E2E2E',
-        marginTop: 20,
-        marginBottom: 12,
     },
     validateButton: {
         padding: 12,
         borderRadius: 8,
         backgroundColor: '#4CAF50',
     },
-
 })

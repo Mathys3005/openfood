@@ -7,6 +7,10 @@ export default function AddLayout() {
                 name="index"
                 options={{title: 'Nouveau repas'}}
             />
+            <Stack.Screen
+                name="camera"
+                options={{title: 'Scanner un produit'}}
+            />
         </Stack>
     );
 }
